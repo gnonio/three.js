@@ -2691,6 +2691,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	function uploadTexture( textureProperties, texture, slot ) {
+		
+		if ( texture instanceof THREE.GpuTexture ) {
+			
+			textureProperties.__webglInit = true;
+
+			texture.addEventListener( 'dispose', onTextureDispose );
+			
+			textureProperties.__webglTexture = texture.image.webgltexture;
+			
+			_infoMemory.textures ++;
+			
+		}
 
 		if ( textureProperties.__webglInit === undefined ) {
 
@@ -2796,6 +2808,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+		} else if ( texture instanceof THREE.GpuTexture ) {
+			
+			// skip specifying texture, it has been done already in GPU memory
+			// what of mipmaps?
+			// what of informing THREE.WebGLState?
+			
 		} else {
 
 			// regular Texture (image, video, canvas)
